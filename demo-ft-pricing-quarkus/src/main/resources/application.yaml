@@ -1,0 +1,30 @@
+quarkus:
+  http:
+    port: 8082
+    access-log:
+      enabled: true
+      pattern: '<< [%s] %D ms "%m %R%q"'
+    record-request-start-time: true
+  log:
+    level: INFO
+    min-level: TRACE
+    console:
+      enable: true
+      darken: 0
+      #format: '%d{HH:mm:ss.SSS} %-5p (%-10t) [%c{2.}] %s%e --- %X%n'
+      format: '%d{HH:mm:ss.SSS} %-5p [%c{1.}] %s%e%n'
+    category:
+      "com.yuriytkach":
+        level: DEBUG
+      "io.smallrye.faulttolerance":
+        level: DEBUG
+  rest-client:
+    product-api:
+      url: http://localhost:8081
+      connect-timeout: 1000
+      read-timeout: 2000
+
+app:
+  default-delay-max: PT0.4S
+  product-fail-each: 3
+  product-sleep-max-sec: 0

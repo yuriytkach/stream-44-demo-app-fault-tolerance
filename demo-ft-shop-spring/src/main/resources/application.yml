@@ -1,0 +1,58 @@
+server:
+  port: 8081
+
+management.endpoints.web.exposure.include: '*'
+management.endpoint.health.show-details: always
+
+management.health.diskspace.enabled: false
+
+logging.level:
+  com.yuriytkach: DEBUG
+
+rest:
+  connect-timeout: PT1S
+  read-timeout: PT5S
+  price-service-url: http://localhost:8082
+
+app:
+  default-delay-max: PT0.4S
+  price-fail-each: 10
+  price-sleep-max-sec: 2
+
+resilience4j.retry:
+  configs:
+    default:
+      maxAttempts: 2
+      waitDuration: 100
+      retryExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
+        - java.io.IOException
+      resultPredicate: com.yuriytkach.demo.demoftspring.ConditionalRetryPredicate
+    instances:
+      pricingService:
+        baseConfig: default
+
+resilience4j.circuitbreaker:
+  configs:
+    default:
+      registerHealthIndicator: true
+      failureRateThreshold: 40
+      slowCallRateThreshold: 40
+      slowCallDurationThreshold: 1000
+      permittedNumberOfCallsInHalfOpenState: 3
+      minimumNumberOfCalls: 10
+      slidingWindowType: COUNT_BASED
+      slidingWindowSize: 10
+      automaticTransitionFromOpenToHalfOpenEnabled: false
+      waitDurationInOpenState: 5s
+      eventConsumerBufferSize: 10
+      recordExceptions:
+        - org.springframework.web.client.HttpServerErrorException
+        - java.util.concurrent.TimeoutException
+        - org.springframework.web.client.ResourceAccessException
+        - java.io.IOException
+    instances:
+      pricingService:
+        baseConfig: default
