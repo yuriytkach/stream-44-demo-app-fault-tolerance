@@ -1,9 +1,5 @@
 package com.yuriytkach.demo.product;
 
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-
-import com.yuriytkach.demo.AppProperties;
-
 import jakarta.inject.Inject;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.ws.rs.GET;
@@ -18,11 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductResource {
 
     @Inject
-    @RestClient
-    ProductApi productApi;
-
-    @Inject
-    AppProperties appProperties;
+    ProductService productService;
 
     @GET
     @Path("/{productId}")
@@ -30,12 +22,8 @@ public class ProductResource {
     public Product findProduct(
       @PathParam("productId") @NotEmpty final String productId
     ) {
-        return productApi.findProduct(
-          productId,
-          appProperties.productFailEach() > 0 ? appProperties.productFailEach() : null,
-          appProperties.productSleepMaxSec() > 0 ? appProperties.productSleepMaxSec() : null
-        );
+        return productService.findProduct(productId);
     }
 
-    public record Product(String id, String name, int rating, boolean fallback) { }
+    public record Product(String id, String name, int rating, boolean fallback, boolean cache) { }
 }

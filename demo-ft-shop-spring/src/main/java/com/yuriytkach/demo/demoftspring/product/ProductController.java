@@ -37,7 +37,7 @@ public class ProductController {
     @RequestParam(value = "failEach", required = false) @Min(1) @Positive final Integer failEachRequest,
     @RequestParam(value = "sleepMaxSec", required = false) @Min(1) @Positive final Integer sleepMaxSec
   ) {
-    log.info(">> Search product {}...", id);
+    log.info(">> Search product: {}, failEach: {}, Sleep: {}...", id, failEachRequest, sleepMaxSec);
 
     if (failEachRequest != null && requestCounter.incrementAndGet() % failEachRequest == 0) {
       log.info("Failing request for product {}", id);
@@ -59,7 +59,7 @@ public class ProductController {
     } else {
       sleepMilli = sleepRandom.nextLong(Duration.ofSeconds(sleepMaxSec).toMillis());
     }
-
+    log.debug("Sleeping {} ms", sleepMilli);
     Thread.sleep(sleepMilli);
   }
 }

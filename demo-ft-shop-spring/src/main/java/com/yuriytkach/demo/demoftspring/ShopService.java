@@ -21,11 +21,12 @@ public class ShopService {
       id,
       productService.getProductById(id).name(),
       productPrice.price(),
-      productPrice.fallback()
+      productPrice.fallback(),
+      productPrice.cache()
     );
     log.info("{}", productWithPrice);
     return productWithPrice;
   }
 
-  public record ProductPrice(String productId, double price, boolean fallback, boolean circuit) { }
+  public record ProductPrice(String productId, double price, boolean fallback, boolean circuit, boolean cache) { }
 }

@@ -2,6 +2,7 @@ package com.yuriytkach.demo.demoftspring;
 
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
+@EnableCaching
 @RequiredArgsConstructor
 @EnableConfigurationProperties({ RestProperties.class, AppProperties.class })
 public class AppConfiguration {

@@ -26,6 +26,9 @@ dependencies {
 
     implementation 'com.tietoevry.quarkus:quarkus-resteasy-problem:3.0.0'
 
+    implementation "io.quarkus:quarkus-smallrye-fault-tolerance"
+    implementation "io.quarkus:quarkus-cache"
+
     testImplementation 'io.quarkus:quarkus-junit5'
     testImplementation 'io.rest-assured:rest-assured'
 }

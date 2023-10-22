@@ -1,5 +1,7 @@
 package com.yuriytkach.demo.demoftspring;
 
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CachePut;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -14,14 +16,19 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class PriceService {
 
+  public static final String PRICES_CACHE = "prices-cache";
+
   private final RestTemplate restTemplate;
   private final AppProperties appProperties;
 
   private final CircuitBreakerRegistry circuitBreakerRegistry;
 
+  private final CacheManager cacheManager;
+
 
   @Retry(name = "pricingService", fallbackMethod = "fetchPriceFallback")
   @CircuitBreaker(name = "pricingService")
+  @CachePut(cacheNames = PRICES_CACHE, unless = "#result.fallback", condition = "#result.price > 0")
   public ShopService.ProductPrice fetchPrice(final String id) {
     log.debug(
       ">> Fetching price for product {}, failEach: {}, maxSleep: {}",
@@ -57,14 +64,24 @@ public class PriceService {
     final io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry.circuitBreaker(
       "pricingService");
 
+    final ShopService.ProductPrice cachedPrice = cacheManager.getCache(PRICES_CACHE).get(
+      id,
+      ShopService.ProductPrice.class
+    );
+
     log.warn(
       "Fallback for product price {} (CB: {}) because of exception {}",
       id,
       cb.getState(),
       ex.getMessage()
     );
-    return new ShopService.ProductPrice(id, 1.0, true,
-      cb.getState() != io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED);
+    return new ShopService.ProductPrice(
+      id,
+      cachedPrice == null ? 1.0 : cachedPrice.price(),
+      true,
+      cb.getState() != io.github.resilience4j.circuitbreaker.CircuitBreaker.State.CLOSED,
+      cachedPrice != null
+    );
   }
 
 }

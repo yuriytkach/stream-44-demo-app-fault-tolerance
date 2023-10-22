@@ -17,6 +17,6 @@ public class ShopController {
     return shopService.getProduct(id);
   }
 
-  public record ShoppingProduct(String id, String name, double price, boolean fallback) { }
+  public record ShoppingProduct(String id, String name, double price, boolean fallback, boolean cache) { }
 
 }
